@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kokoy Dictionary — Preserving the Creole of Northeast Dominica</title>
+<meta name="description" content="A searchable, community-built dictionary of Kokoy, the English-based creole spoken in Marigot, Wesley, Woodford Hill, and Clifton, Dominica." />
+<meta name="theme-color" content="#36069A" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <h1>Kokoy Dictionary</h1>
+      <p class="tagline">Wesley &amp; the Northeast, Dominica</p>
+    </div>
+    <nav class="site-nav" aria-label="Primary">
+      <ul>
+        <li><a href="#dictionary">Dictionary</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#suggest">Suggest a Word</a></li>
+        <li><a href="#donate">Donate</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main-content">
+
+  <div id="install-banner" class="install-banner" role="status">
+    <span>Install Kokoy Dictionary on your device for offline access.</span>
+    <button id="install-btn" class="btn btn-secondary">Install</button>
+  </div>
+
+  <section id="wotd" aria-labelledby="wotd-heading">
+    <h2 id="wotd-heading">Word of the Day</h2>
+    <div class="wotd-card" id="wotd-card">
+      <p class="wotd-label">Today in Kokoy</p>
+      <p class="wotd-word" id="wotd-word">—</p>
+      <p class="wotd-english" id="wotd-english">Loading…</p>
+      <p class="wotd-pron" id="wotd-pron"></p>
+    </div>
+  </section>
+
+  <section id="dictionary" aria-labelledby="dictionary-heading">
+    <h2 id="dictionary-heading">Dictionary</h2>
+
+    <div class="search-wrap" role="search">
+      <label for="search-input" class="visually-hidden">Search Kokoy or English words</label>
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search a Kokoy or English word…"
+        autocomplete="off"
+      />
+      <select id="category-filter" aria-label="Filter by category">
+        <option value="">All categories</option>
+      </select>
+    </div>
+
+    <p class="result-count" id="result-count" aria-live="polite"></p>
+
+    <ul class="word-list" id="word-list"></ul>
+  </section>
+
+  <section id="about-section">
+    <details class="section-accordion" id="about">
+      <summary aria-controls="about-body">
+        <h2 id="about-heading">About Kokoy</h2>
+      </summary>
+      <div class="accordion-body" id="about-body">
+        <div class="about-grid">
+          <div class="about-item">
+            <h3>The Language Gap</h3>
+            <p>When the British took over Dominica from the French, they could not communicate with the enslaved people, who spoke French Creole (Kwéyòl). To bridge that gap, the British brought English-speaking enslaved people from Antigua, Montserrat, and St. Kitts to work specific estates, including Hatton Garden and Woodford Hill.</p>
+          </div>
+          <div class="about-item">
+            <h3>A New Culture and Religion</h3>
+            <p>These new arrivals brought their own customs, Protestant/Methodist religion, and English-based language, which strongly shaped the northeastern villages of Marigot, Wesley, Woodford Hill, and Clifton.</p>
+          </div>
+          <div class="about-item">
+            <h3>The Birth of Kokoy</h3>
+            <p>To communicate across the language barrier, an English-based creole called Kokoy was created, related to the creoles spoken in Jamaica and Antigua.</p>
+          </div>
+          <div class="about-item">
+            <h3>How Kokoy Is Viewed Today</h3>
+            <p>Once dismissed as a dialect for the uneducated, Kokoy is now celebrated and widely accepted, with speakers pushing for its recognition as a valid language in its own right.</p>
+          </div>
+          <div class="about-item">
+            <h3>The Name "Kokoy"</h3>
+            <p>Its origin is uncertain. Local lore says people from other villages thought the accent sounded like someone choking on a piece of kokoy (dry coconut meat).</p>
+          </div>
+          <div class="about-item">
+            <h3>Why This Project Exists</h3>
+            <p>To document and preserve Kokoy for future generations, built and maintained by a community member from Wesley, Dominica.</p>
+          </div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="suggest-section">
+    <details class="section-accordion" id="suggest">
+      <summary aria-controls="suggest-body">
+        <h2 id="suggest-heading">Suggest a Word or Phrase</h2>
+      </summary>
+      <div class="accordion-body" id="suggest-body">
+        <p>Know a Kokoy word, phrase, or correction that belongs here? Submit it below — it opens a pre-filled entry on GitHub for review, no account setup required to draft it.</p>
+        <form id="suggest-form">
+          <label for="s-kokoy">Kokoy word or phrase</label>
+          <input type="text" id="s-kokoy" name="kokoy" required />
+
+          <label for="s-english">English meaning</label>
+          <input type="text" id="s-english" name="english" required />
+
+          <label for="s-pron">Pronunciation (optional, spelled phonetically)</label>
+          <input type="text" id="s-pron" name="pronunciation" />
+
+          <label for="s-example">Example sentence (optional)</label>
+          <textarea id="s-example" name="example"></textarea>
+
+          <label for="s-name">Your name or village (optional, for credit)</label>
+          <input type="text" id="s-name" name="contributor" />
+
+          <p class="form-hint" id="suggest-hint">This opens GitHub in a new tab with your suggestion pre-filled. Nothing is submitted until you click "Submit new issue" there.</p>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" aria-describedby="suggest-hint">Preview &amp; Submit Suggestion</button>
+          </div>
+        </form>
+      </div>
+    </details>
+  </section>
+
+  <section id="donate" aria-labelledby="donate-heading">
+    <h2 id="donate-heading">Support the Project</h2>
+    <div class="donate-card">
+      <p>Kokoy Dictionary is a free, community-run effort to preserve a living language. If it's meaningful to you, consider supporting the work.</p>
+      <a id="kofi-link" class="btn btn-donate" href="#" target="_blank" rel="noopener">Donate via Ko-fi</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Kokoy Dictionary &mdash; a project to preserve the creole language of Marigot, Wesley, Woodford Hill, and Clifton, Dominica.</p>
+  <p><a href="#suggest">Contribute a word</a> &middot; <a id="footer-email" href="#">Contact</a></p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
