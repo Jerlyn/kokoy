@@ -1,32 +1,37 @@
-/* Kokoy Dictionary — brand palette
-   Primary:  #36069A (purple), #DE6399 (pink)
-   Dark:     #020C28 (navy)
-   Accent:   #4ADEDE (cyan — dark backgrounds only, see focus-ring note below)
-   Neutrals: #FFFFFF, #F8F9FA, #212529, #595959, #ADB5BD
-   All text/background pairs below verified WCAG AA (4.5:1+) for normal text
-   with a contrast-ratio script, not by eye. --cyan measures ~1.6:1 on white/
-   offwhite, so it is ONLY used as text/UI color on navy or purple
-   backgrounds (11.78:1 / 7.76:1) — never on light ones. */
+/* Kokoy Dictionary — standalone tropical palette (deliberately not the
+   Design Lady brand system; this project has its own identity).
+   Primary:  #0B6B68 (deep ocean teal)
+   Secondary:#E85D04 (sunset coral) — used as --coral-dark (#A74202) for any
+             text-bearing use, since white-on-#E85D04 only measures 3.50:1
+             and fails the 4.5:1 AA floor for normal text. Reserve plain
+             --coral for large decorative fills only, never small text.
+   Dark:     #072A27 (deep forest night)
+   Accent:   #5EEAD4 (mint — dark backgrounds only, mirrors the old cyan's
+             role, see focus-ring note below)
+   Neutrals: #FFFFFF, #F4F9F8 (warm white), #1D2A2A (charcoal), #4B5B5A (slate)
+   All pairs below verified WCAG AA with a contrast-ratio script, not by
+   eye. --mint measures ~1.4:1 on white/warmwhite, so it is ONLY used as
+   text/UI color on forest or teal backgrounds (10.4:1+), never on light
+   ones — same rule that applied to the old --cyan. */
 
 :root {
-  --purple: #36069A;
-  --purple-hover: #230367;
-  --pink: #DE6399;
-  --pink-dark: #C24379;
-  --pink-dark-hover: #9E3160;
-  --navy: #020C28;
-  --cyan: #4ADEDE;
+  --teal: #0B6B68;
+  --teal-hover: #08504E;
+  --coral: #E85D04;
+  --coral-dark: #A74202;
+  --coral-dark-hover: #8B3702;
+  --forest: #072A27;
+  --mint: #5EEAD4;
   --white: #FFFFFF;
-  --offwhite: #F8F9FA;
-  --dark: #212529;
-  --gray: #595959;
-  --lightgray: #ADB5BD;
-  /* Your brand's specified neutral, used specifically for borders on real
-     interactive controls (search input, clickable <details> containers) —
-     #ADB5BD only measures 2.07:1 on white, below the 3:1 WCAG 1.4.11
-     minimum for a perceivable control boundary; #6C757D clears it at
-     4.69:1. Decorative-only dividers keep --lightgray. */
-  --border-strong: #6C757D;
+  --warmwhite: #F4F9F8;
+  --charcoal: #1D2A2A;
+  --slate: #4B5B5A;
+  --soft-divider: #CBD5D3;
+  /* Flat pre-computed 8% teal-over-white, used for chip/tag fills — a
+     solid color, not a live rgba() overlay, so its contrast stays fixed
+     and verifiable regardless of what's rendered underneath (deliberately
+     avoiding the unpredictable-contrast problem true glassmorphism has). */
+  --teal-tint: #EBF3F3;
 
   /* Headings + UI chrome (nav, buttons, chips, labels): Plus Jakarta Sans,
      geometric and clear at small sizes. Definitions/notes/history content:
@@ -37,7 +42,7 @@
   --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: "Lora", Georgia, "Times New Roman", serif;
   --radius: 10px;
-  --shadow: 0 2px 10px rgba(2, 12, 40, 0.12);
+  --shadow: 0 2px 10px rgba(7, 42, 39, 0.12);
 }
 
 * { box-sizing: border-box; }
@@ -47,8 +52,8 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: var(--offwhite);
-  color: var(--navy);
+  background: var(--warmwhite);
+  color: var(--forest);
   line-height: 1.5;
 }
 
@@ -58,7 +63,7 @@ body {
   left: -999px;
   top: 0;
   background: var(--white);
-  color: var(--purple);
+  color: var(--teal);
   padding: 0.75rem 1rem;
   z-index: 100;
   border-radius: 0 0 8px 0;
@@ -89,7 +94,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 3px solid var(--purple);
+  outline: 3px solid var(--teal);
   outline-offset: 3px;
 }
 
@@ -98,11 +103,11 @@ header.site-header :focus-visible,
 footer :focus-visible,
 .donate-card :focus-visible,
 .wotd-card :focus-visible {
-  outline-color: var(--cyan);
+  outline-color: var(--mint);
 }
 
 header.site-header {
-  background: var(--navy);
+  background: var(--forest);
   color: var(--white);
   padding: 1.25rem 1rem;
 }
@@ -130,7 +135,7 @@ header.site-header {
 }
 
 .brand .tagline {
-  color: var(--cyan);
+  color: var(--mint);
   font-size: 0.85rem;
   margin: 0;
 }
@@ -154,7 +159,7 @@ nav.site-nav a {
 
 nav.site-nav a:hover,
 nav.site-nav a:focus-visible {
-  border-bottom-color: var(--cyan);
+  border-bottom-color: var(--mint);
 }
 
 main {
@@ -168,10 +173,15 @@ section {
 }
 
 section > h2 {
-  color: var(--purple);
-  border-bottom: 2px solid var(--pink);
-  padding-bottom: 0.4rem;
+  color: var(--teal);
+  font-weight: 700;
   font-size: 1.3rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+section:first-of-type > h2 {
+  margin-top: 0;
 }
 
 /* Section-level accordion (About, Suggest a Word) — native <details>, so it
@@ -180,8 +190,8 @@ section > h2 {
    sections (structure), not dictionary content, and should read that way
    at a glance rather than blending into the word-browsing list. */
 .section-accordion {
-  border: 1px solid var(--border-strong);
-  border-top: 4px solid var(--pink);
+  border: 1px solid var(--slate);
+  border-top: 4px solid var(--coral);
   border-radius: var(--radius);
   background: var(--white);
   box-shadow: var(--shadow);
@@ -196,7 +206,7 @@ section > h2 {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1.1rem 1.25rem;
-  background: var(--offwhite);
+  background: var(--warmwhite);
 }
 
 .section-accordion > summary::-webkit-details-marker { display: none; }
@@ -212,7 +222,7 @@ section > h2 {
   content: "+";
   font-size: 1.4rem;
   line-height: 1;
-  color: var(--pink-dark);
+  color: var(--coral-dark);
   flex-shrink: 0;
   transition: transform 0.15s ease;
 }
@@ -230,7 +240,10 @@ section > h2 {
 
 /* Word of the day */
 .wotd-card {
-  background: var(--purple);
+  /* Gradient between two already-verified colors (6.33:1 and 9.26:1 for
+     white text) rather than introducing an unverified third color — every
+     point along the ramp stays comfortably above the 4.5:1 floor. */
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-hover) 100%);
   color: var(--white);
   border-radius: var(--radius);
   padding: 1.5rem;
@@ -247,7 +260,7 @@ section > h2 {
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: var(--cyan);
+  background: var(--mint);
   opacity: 0.15;
 }
 
@@ -255,7 +268,7 @@ section > h2 {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
-  color: var(--cyan);
+  color: var(--mint);
   margin: 0 0 0.4rem;
 }
 
@@ -268,13 +281,13 @@ section > h2 {
 .wotd-english {
   font-size: 1.1rem;
   margin: 0.25rem 0 0.75rem;
-  color: var(--offwhite);
+  color: var(--warmwhite);
   font-family: var(--font-serif);
 }
 
 .wotd-pron {
   font-style: italic;
-  color: var(--offwhite);
+  color: var(--warmwhite);
   opacity: 0.85;
   font-family: var(--font-serif);
 }
@@ -291,14 +304,14 @@ section > h2 {
   flex: 1 1 240px;
   padding: 0.7rem 1rem;
   font-size: 1rem;
-  border: 2px solid var(--border-strong);
+  border: 2px solid var(--slate);
   border-radius: var(--radius);
   background: var(--white);
-  color: var(--navy);
+  color: var(--forest);
 }
 
 #search-input:focus-visible {
-  border-color: var(--purple);
+  border-color: var(--teal);
 }
 
 /* Category chips — replace the old single-select dropdown. Toggle buttons,
@@ -317,27 +330,28 @@ section > h2 {
 }
 
 .chip {
-  border: 2px solid var(--purple);
-  background: var(--white);
-  color: var(--purple);
+  border: 1px solid transparent;
+  background: var(--teal-tint);
+  color: var(--teal);
   border-radius: 999px;
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 0.9rem;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
 }
 
 .chip:hover {
-  background: var(--offwhite);
+  border-color: var(--teal);
 }
 
 .chip[aria-pressed="true"] {
-  background: var(--purple);
+  background: var(--teal);
   color: var(--white);
+  box-shadow: 0 2px 8px rgba(11, 107, 104, 0.35);
 }
 
 .result-count {
-  color: var(--gray);
+  color: var(--slate);
   font-size: 0.9rem;
   margin: 0 0 0.75rem;
 }
@@ -353,7 +367,7 @@ section > h2 {
 
 .word-card {
   background: var(--white);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--slate);
   border-radius: var(--radius);
   padding: 1rem 1.1rem;
 }
@@ -373,18 +387,18 @@ section > h2 {
 .word-kokoy {
   font-weight: 700;
   font-size: 1.15rem;
-  color: var(--purple);
+  color: var(--teal);
 }
 
 .word-english {
-  color: var(--dark);
+  color: var(--charcoal);
 }
 
 .word-tag {
   display: inline-block;
-  background: var(--offwhite);
-  color: var(--purple);
-  border: 1px solid var(--purple);
+  background: var(--warmwhite);
+  color: var(--teal);
+  border: 1px solid var(--teal);
   border-radius: 999px;
   padding: 0.1rem 0.6rem;
   font-size: 0.75rem;
@@ -394,15 +408,15 @@ section > h2 {
 .word-detail {
   margin-top: 0.7rem;
   padding-top: 0.7rem;
-  border-top: 1px dashed var(--lightgray);
-  color: var(--dark);
+  border-top: 1px dashed var(--soft-divider);
+  color: var(--charcoal);
   font-size: 0.95rem;
   font-family: var(--font-serif);
 }
 
 .word-detail dt {
   font-weight: 600;
-  color: var(--gray);
+  color: var(--slate);
   margin-top: 0.5rem;
 }
 
@@ -411,7 +425,7 @@ section > h2 {
 }
 
 .empty-state {
-  color: var(--gray);
+  color: var(--slate);
   padding: 2rem 1rem;
   text-align: center;
 }
@@ -420,7 +434,7 @@ section > h2 {
    mobile lands on ~10 tappable rows instead of scrolling 217 words. */
 .category-group {
   background: var(--white);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--slate);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -434,7 +448,7 @@ section > h2 {
   gap: 0.75rem;
   padding: 0.9rem 1.1rem;
   font-weight: 700;
-  color: var(--purple);
+  color: var(--teal);
 }
 
 .category-group > summary::-webkit-details-marker { display: none; }
@@ -442,7 +456,7 @@ section > h2 {
 .category-group > summary::after {
   content: "+";
   font-size: 1.2rem;
-  color: var(--purple);
+  color: var(--teal);
   flex-shrink: 0;
 }
 
@@ -451,7 +465,7 @@ section > h2 {
 }
 
 .category-group .category-count {
-  color: var(--gray);
+  color: var(--slate);
   font-weight: 400;
   font-size: 0.85rem;
   margin-left: 0.4rem;
@@ -462,8 +476,8 @@ section > h2 {
 }
 
 .category-group .word-card {
-  border-color: var(--offwhite);
-  background: var(--offwhite);
+  border-color: var(--warmwhite);
+  background: var(--warmwhite);
 }
 
 /* Buttons */
@@ -479,31 +493,31 @@ section > h2 {
 }
 
 .btn-primary {
-  background: var(--purple);
+  background: var(--teal);
   color: var(--white);
 }
-.btn-primary:hover, .btn-primary:focus-visible { background: var(--purple-hover); }
+.btn-primary:hover, .btn-primary:focus-visible { background: var(--teal-hover); }
 
 .btn-donate {
-  /* White on plain --pink is 3.31:1 (fails AA); pink-dark clears 4.80:1. */
-  background: var(--pink-dark);
+  /* White on plain --coral is 3.31:1 (fails AA); pink-dark clears 4.80:1. */
+  background: var(--coral-dark);
   color: var(--white);
 }
-.btn-donate:hover, .btn-donate:focus-visible { background: var(--pink-dark-hover); }
+.btn-donate:hover, .btn-donate:focus-visible { background: var(--coral-dark-hover); }
 
 .btn-secondary {
   background: var(--white);
-  color: var(--purple);
-  border: 2px solid var(--purple);
+  color: var(--teal);
+  border: 2px solid var(--teal);
 }
-.btn-secondary:hover, .btn-secondary:focus-visible { background: var(--offwhite); }
+.btn-secondary:hover, .btn-secondary:focus-visible { background: var(--warmwhite); }
 
 /* Forms */
 label {
   display: block;
   font-weight: 600;
   margin: 0.9rem 0 0.3rem;
-  color: var(--dark);
+  color: var(--charcoal);
 }
 
 input[type="text"],
@@ -512,18 +526,18 @@ textarea,
 select {
   width: 100%;
   padding: 0.65rem 0.8rem;
-  border: 2px solid var(--lightgray);
+  border: 2px solid var(--soft-divider);
   border-radius: 8px;
   font-family: inherit;
   font-size: 1rem;
-  color: var(--navy);
+  color: var(--forest);
   background: var(--white);
 }
 
 textarea { min-height: 90px; resize: vertical; }
 
 .form-hint {
-  color: var(--gray);
+  color: var(--slate);
   font-size: 0.85rem;
   margin: 0.2rem 0 0;
 }
@@ -535,15 +549,15 @@ textarea { min-height: 90px; resize: vertical; }
 .form-status {
   margin: 0.75rem 0 0;
   font-weight: 600;
-  color: var(--purple);
+  color: var(--teal);
   min-height: 1.2em;
 }
 
 .form-alt {
   margin: 1.25rem 0 0;
   padding-top: 1.1rem;
-  border-top: 1px dashed var(--lightgray);
-  color: var(--gray);
+  border-top: 1px dashed var(--soft-divider);
+  color: var(--slate);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -561,7 +575,7 @@ textarea { min-height: 90px; resize: vertical; }
 
 .about-item {
   background: var(--white);
-  border: 1px solid var(--lightgray);
+  border: 1px solid var(--soft-divider);
   border-radius: var(--radius);
   padding: 1.1rem 1.25rem;
   box-shadow: var(--shadow);
@@ -569,13 +583,13 @@ textarea { min-height: 90px; resize: vertical; }
 
 .about-item h3 {
   margin: 0 0 0.4rem;
-  color: var(--purple);
+  color: var(--teal);
   font-size: 1.05rem;
 }
 
 .about-item p {
   margin: 0;
-  color: var(--dark);
+  color: var(--charcoal);
   font-family: var(--font-serif);
   line-height: 1.6;
 }
@@ -588,31 +602,31 @@ textarea { min-height: 90px; resize: vertical; }
 
 /* Donate section */
 .donate-card {
-  background: var(--navy);
+  background: var(--forest);
   color: var(--white);
   border-radius: var(--radius);
   padding: 1.5rem;
   text-align: center;
 }
-.donate-card p { color: var(--offwhite); }
+.donate-card p { color: var(--warmwhite); }
 
 footer {
-  background: var(--navy);
-  color: var(--offwhite);
+  background: var(--forest);
+  color: var(--warmwhite);
   text-align: center;
   padding: 1.5rem 1rem;
   font-size: 0.85rem;
 }
 
-footer a { color: var(--cyan); }
+footer a { color: var(--mint); }
 
 .install-banner {
   display: none;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  background: var(--cyan);
-  color: var(--navy);
+  background: var(--mint);
+  color: var(--forest);
   padding: 0.75rem 1rem;
   border-radius: var(--radius);
   margin-bottom: 1.5rem;
