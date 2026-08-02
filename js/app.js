@@ -198,7 +198,12 @@
     );
   }
 
-  function renderWordCard(word) {
+  // showCategoryTag defaults to true for flat/search results, where cards
+  // from different categories can sit side by side and the tag is useful
+  // context. renderGroupedView() passes false, since inside an already-
+  // labeled "Family & People" section, repeating "Family & People" on
+  // every single row underneath is pure noise.
+  function renderWordCard(word, showCategoryTag = true) {
     const li = document.createElement("li");
     li.className = "word-card";
 
@@ -207,7 +212,7 @@
 
     const left = document.createElement("span");
     left.innerHTML = `<span class="word-kokoy">${escapeHtml(word.kokoy)}</span> <span class="word-english">— ${escapeHtml(word.english)}</span>`;
-    if (word.category) {
+    if (word.category && showCategoryTag) {
       const tag = document.createElement("span");
       tag.className = "word-tag";
       tag.textContent = word.category;
@@ -331,7 +336,7 @@
       const nestedList = document.createElement("ul");
       nestedList.className = "word-list";
       for (const word of words) {
-        nestedList.appendChild(renderWordCard(word));
+        nestedList.appendChild(renderWordCard(word, false));
       }
       details.appendChild(nestedList);
 
