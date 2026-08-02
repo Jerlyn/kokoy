@@ -620,6 +620,24 @@ footer {
 
 footer a { color: var(--mint); }
 
+.made-by {
+  display: inline-block;
+  margin-top: 1.1rem;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.made-by:hover,
+.made-by:focus-visible {
+  opacity: 1;
+}
+
+.made-by img {
+  display: block;
+  height: 32px;
+  width: auto;
+}
+
 .install-banner {
   display: none;
   align-items: center;

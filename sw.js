@@ -2,7 +2,7 @@
 // Cache-first for the app shell + dictionary data, so the dictionary
 // works fully offline once a user has visited it once.
 
-const CACHE_NAME = "kokoy-dictionary-v6";
+const CACHE_NAME = "kokoy-dictionary-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const APP_SHELL = [
   "./icons/icon-512.png",
   "./icons/icon-maskable-192.png",
   "./icons/icon-maskable-512.png",
+  "./icons/made.png",
 ];
 
 self.addEventListener("install", (event) => {
