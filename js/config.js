@@ -19,4 +19,10 @@ const KOKOY_CONFIG = {
 
   // Contact email shown in the footer / about section.
   contactEmail: "jerlyn@designlady.com",
+
+  // Your GA4 Measurement ID (looks like "G-XXXXXXXXXX"), from Google
+  // Analytics > Admin > Data Streams > your web stream. Leave the
+  // placeholder as-is to skip analytics entirely (no script loads, no
+  // tracking, until this is set).
+  googleAnalyticsId: "G-XF98Y7WEYZ",
 };

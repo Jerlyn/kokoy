@@ -272,10 +272,55 @@ section:first-of-type > h2 {
   margin: 0 0 0.4rem;
 }
 
+.wotd-word-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
 .wotd-word {
   font-size: 2rem;
   margin: 0;
   font-family: var(--font-heading);
+}
+
+.wotd-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--white);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.wotd-status {
+  /* White, not mint: mint-on-teal measures 4.28:1 at the gradient's darker
+     end, just under the 4.5:1 text floor. White clears 6.33:1/9.26:1
+     across the whole gradient, so it's safe regardless of where this text
+     sits on the card. */
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--white);
+  min-height: 1.1em;
 }
 
 .wotd-english {
@@ -383,6 +428,31 @@ section:first-of-type > h2 {
 }
 
 .word-card summary::-webkit-details-marker { display: none; }
+
+.word-copy-btn {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--teal);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.word-copy-btn:hover {
+  background: var(--teal-tint);
+}
+
+.word-copy-btn.copied {
+  background: var(--teal);
+  color: var(--white);
+}
 
 .word-kokoy {
   font-weight: 700;

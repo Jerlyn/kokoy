@@ -7,6 +7,7 @@
 
   let dictionary = [];
   let activeCategory = ""; // "" = All
+  let currentWordOfDay = null;
 
   // Fixed display order for the taxonomy — keeps chips and grouped sections
   // in a stable, sensible order instead of whatever order Set() happens to
@@ -32,6 +33,9 @@
     wotdWord: document.getElementById("wotd-word"),
     wotdEnglish: document.getElementById("wotd-english"),
     wotdPron: document.getElementById("wotd-pron"),
+    wotdStatus: document.getElementById("wotd-status"),
+    wotdCopyBtn: document.getElementById("wotd-copy-btn"),
+    wotdShareBtn: document.getElementById("wotd-share-btn"),
     suggestForm: document.getElementById("suggest-form"),
     suggestStatus: document.getElementById("suggest-status"),
     suggestAccessKey: document.getElementById("s-access-key"),
@@ -40,6 +44,7 @@
     footerEmail: document.getElementById("footer-email"),
     installBanner: document.getElementById("install-banner"),
     installBtn: document.getElementById("install-btn"),
+    copyAnnouncer: document.getElementById("copy-announcer"),
   };
 
   // ---- Data loading -------------------------------------------------
@@ -63,9 +68,85 @@
     if (!dictionary.length) return;
     const idx = dayOfYear(new Date()) % dictionary.length;
     const word = dictionary[idx];
+    currentWordOfDay = word;
     els.wotdWord.textContent = word.kokoy;
     els.wotdEnglish.textContent = word.english;
     els.wotdPron.textContent = word.pronunciation ? `/${word.pronunciation}/` : "";
+  }
+
+  // ---- Copy & share -----------------------------------------------------
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback for browsers/contexts without the async Clipboard API.
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    temp.style.position = "fixed";
+    temp.style.opacity = "0";
+    document.body.appendChild(temp);
+    temp.select();
+    try {
+      document.execCommand("copy");
+    } finally {
+      document.body.removeChild(temp);
+    }
+    return Promise.resolve();
+  }
+
+  function announceCopy(word) {
+    if (els.copyAnnouncer) {
+      els.copyAnnouncer.textContent = `Copied "${word}" to clipboard`;
+    }
+  }
+
+  function flashStatus(el, message, duration = 2000) {
+    if (!el) return;
+    el.textContent = message;
+    window.clearTimeout(el._flashTimeout);
+    el._flashTimeout = window.setTimeout(() => {
+      el.textContent = "";
+    }, duration);
+  }
+
+  function setupWotdActions() {
+    if (els.wotdCopyBtn) {
+      els.wotdCopyBtn.addEventListener("click", () => {
+        if (!currentWordOfDay) return;
+        copyText(currentWordOfDay.kokoy).then(() => {
+          flashStatus(els.wotdStatus, `Copied "${currentWordOfDay.kokoy}"`);
+          announceCopy(currentWordOfDay.kokoy);
+        });
+      });
+    }
+
+    if (els.wotdShareBtn) {
+      els.wotdShareBtn.addEventListener("click", async () => {
+        if (!currentWordOfDay) return;
+        const shareText = `Kokoy word of the day: "${currentWordOfDay.kokoy}" means "${currentWordOfDay.english}." Learn more at https://jerlyn.github.io/kokoy`;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "Kokoy Dictionary",
+              text: shareText,
+              url: "https://jerlyn.github.io/kokoy",
+            });
+          } catch (err) {
+            // AbortError just means the user closed the share sheet, not a real error.
+            if (err && err.name !== "AbortError") {
+              flashStatus(els.wotdStatus, "Couldn't open the share sheet, copied instead.");
+              copyText(shareText);
+            }
+          }
+        } else {
+          copyText(shareText).then(() => {
+            flashStatus(els.wotdStatus, "Link copied to clipboard");
+          });
+        }
+      });
+    }
   }
 
   // ---- Category chips ---------------------------------------------------
@@ -133,6 +214,28 @@
       left.appendChild(tag);
     }
     summary.appendChild(left);
+
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "word-copy-btn";
+    copyBtn.setAttribute("aria-label", `Copy "${word.kokoy}"`);
+    copyBtn.innerHTML =
+      '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"/></svg>';
+    // preventDefault stops the click from also triggering the parent
+    // <summary>'s native open/close toggle — without it, copying a word
+    // would also expand or collapse the card, which reads as a bug.
+    copyBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      copyText(word.kokoy).then(() => {
+        copyBtn.classList.add("copied");
+        announceCopy(word.kokoy);
+        window.clearTimeout(copyBtn._resetTimeout);
+        copyBtn._resetTimeout = window.setTimeout(() => copyBtn.classList.remove("copied"), 1200);
+      });
+    });
+    summary.appendChild(copyBtn);
+
     details.appendChild(summary);
 
     const dl = document.createElement("dl");
@@ -398,6 +501,29 @@
     openAccordionFromHash(); // handle direct load with a #about / #suggest URL
   }
 
+  // ---- Analytics ------------------------------------------------------
+  // Loaded dynamically (not a hardcoded <script> tag in index.html) so the
+  // config stays centralized in js/config.js like every other integration
+  // here, and so nothing loads/tracks at all until a real ID is set.
+
+  function setupAnalytics() {
+    const id = KOKOY_CONFIG.googleAnalyticsId;
+    if (!id || id.startsWith("G-XXXX")) return;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+    window.gtag = gtag;
+    gtag("js", new Date());
+    gtag("config", id);
+  }
+
   // ---- Service worker -----------------------------------------------
 
   function registerServiceWorker() {
@@ -413,9 +539,11 @@
   async function init() {
     setupLinks();
     setupSuggestForm();
+    setupAnalytics();
     await loadData();
     populateCategoryChips();
     renderWordOfTheDay();
+    setupWotdActions();
     renderResults();
     els.searchInput.addEventListener("input", renderResults);
     setupAccordionAnchors();
