@@ -2,7 +2,7 @@
 // Cache-first for the app shell + dictionary data, so the dictionary
 // works fully offline once a user has visited it once.
 
-const CACHE_NAME = "kokoy-dictionary-v7";
+const CACHE_NAME = "kokoy-dictionary-v8";
 const APP_SHELL = [
   "./",
   "./index.html",

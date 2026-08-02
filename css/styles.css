@@ -565,6 +565,29 @@ textarea { min-height: 90px; resize: vertical; }
   flex-wrap: wrap;
 }
 
+/* Styled as a plain text link, not a button, on purpose: it's a quieter
+   secondary path and shouldn't visually compete with the real submit
+   button above it. Kept as a <button> element (not <a>) since it triggers
+   a JS action, not a navigation, that distinction matters for screen
+   reader users even though it reads as a link. */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.link-btn:hover,
+.link-btn:focus-visible {
+  color: var(--teal-hover);
+}
+
 /* About — semantic grid instead of consecutive bolded paragraphs */
 .about-grid {
   display: grid;
