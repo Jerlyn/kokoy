@@ -117,6 +117,7 @@
         copyText(currentWordOfDay.kokoy).then(() => {
           flashStatus(els.wotdStatus, `Copied "${currentWordOfDay.kokoy}"`);
           announceCopy(currentWordOfDay.kokoy);
+          trackEvent("wotd_copy", { kokoy: currentWordOfDay.kokoy });
         });
       });
     }
@@ -133,16 +134,20 @@
               text: shareText,
               url: "https://jerlyn.github.io/kokoy",
             });
+            trackEvent("wotd_share", { kokoy: currentWordOfDay.kokoy, method: "native" });
           } catch (err) {
             // AbortError just means the user closed the share sheet, not a real error.
             if (err && err.name !== "AbortError") {
-              flashStatus(els.wotdStatus, "Couldn't open the share sheet, copied instead.");
-              copyText(shareText);
+              copyText(shareText).then(() => {
+                flashStatus(els.wotdStatus, "Copied! Paste it into an email or message to share.", 3500);
+                trackEvent("wotd_share", { kokoy: currentWordOfDay.kokoy, method: "clipboard-fallback" });
+              });
             }
           }
         } else {
           copyText(shareText).then(() => {
-            flashStatus(els.wotdStatus, "Link copied to clipboard");
+            flashStatus(els.wotdStatus, "Copied! Paste it into an email or message to share.", 3500);
+            trackEvent("wotd_share", { kokoy: currentWordOfDay.kokoy, method: "clipboard-fallback" });
           });
         }
       });
@@ -175,6 +180,7 @@
       activeCategory = value;
       updateChipState();
       renderResults();
+      trackEvent("category_filter", { category: value || "All" });
     });
     return btn;
   }
@@ -235,6 +241,7 @@
       copyText(word.kokoy).then(() => {
         copyBtn.classList.add("copied");
         announceCopy(word.kokoy);
+        trackEvent("word_copy", { kokoy: word.kokoy });
         window.clearTimeout(copyBtn._resetTimeout);
         copyBtn._resetTimeout = window.setTimeout(() => copyBtn.classList.remove("copied"), 1200);
       });
@@ -242,6 +249,19 @@
     summary.appendChild(copyBtn);
 
     details.appendChild(summary);
+
+    // "toggle" fires on both open AND close — only track opens, so this
+    // reads as "word_view" (someone looked at this word), not noise from
+    // people closing cards.
+    details.addEventListener("toggle", () => {
+      if (details.open) {
+        trackEvent("word_view", {
+          kokoy: word.kokoy,
+          english: word.english,
+          category: word.category || "uncategorized",
+        });
+      }
+    });
 
     const dl = document.createElement("dl");
     dl.className = "word-detail";
@@ -393,6 +413,16 @@
       els.suggestAccessKey.value = KOKOY_CONFIG.web3formsAccessKey || "";
     }
 
+    // Fires once, on the first time someone actually interacts with a
+    // field, not just scrolls past or opens the accordion. { once: true }
+    // means this listener removes itself after firing, so it can't
+    // double-count on the second field they touch.
+    els.suggestForm.addEventListener(
+      "focusin",
+      () => trackEvent("suggest_form_start"),
+      { once: true }
+    );
+
     els.suggestForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -418,6 +448,7 @@
           els.suggestStatus.textContent = "Thanks! Your suggestion was sent.";
           els.suggestForm.reset();
           if (els.suggestAccessKey) els.suggestAccessKey.value = key;
+          trackEvent("suggest_form_submit");
         } else {
           els.suggestStatus.textContent =
             result.message || "Something went wrong sending that — try the GitHub option below instead.";
@@ -436,6 +467,7 @@
           return;
         }
         window.open(buildGithubIssueUrl(), "_blank", "noopener");
+        trackEvent("suggest_form_github_fallback");
       });
     }
   }
@@ -527,6 +559,14 @@
     window.gtag = gtag;
     gtag("js", new Date());
     gtag("config", id);
+  }
+
+  // Safe no-op if analytics isn't configured — every call site below can
+  // fire this unconditionally without checking whether GA is set up.
+  function trackEvent(name, params) {
+    if (typeof window.gtag === "function") {
+      window.gtag("event", name, params || {});
+    }
   }
 
   // ---- Service worker -----------------------------------------------

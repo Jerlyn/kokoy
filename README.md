@@ -103,6 +103,25 @@ The suggestion form pre-fills a GitHub Issue with the label `word-suggestion`. G
 
 Create a free account at [ko-fi.com](https://ko-fi.com), note your username from your page URL (`ko-fi.com/<username>`), and drop it into `js/config.js`.
 
+## 6. Set up Google Analytics (optional)
+
+1. [analytics.google.com](https://analytics.google.com) → Admin → Create Property → Web stream, using `https://jerlyn.github.io/kokoy`.
+2. Copy the Measurement ID (`G-XXXXXXXXXX`) from the stream details page.
+3. Paste it into `googleAnalyticsId` in `js/config.js`. Nothing loads or tracks until this is set to a real value.
+
+Outbound link clicks (Ko-fi, GitHub, the footer signature) are tracked automatically by GA4's Enhanced Measurement, no code needed. These custom events are also wired in and will show up under Reports → Engagement → Events once traffic comes in:
+
+| Event | Fires when | Params |
+|---|---|---|
+| `word_view` | A dictionary word card is expanded | `kokoy`, `english`, `category` |
+| `word_copy` | The copy icon on a word card is used | `kokoy` |
+| `category_filter` | A category chip is clicked | `category` |
+| `suggest_form_start` | First field focus in the suggestion form | — |
+| `suggest_form_submit` | Suggestion successfully sent via Web3Forms | — |
+| `suggest_form_github_fallback` | "Submit as a GitHub Issue instead" clicked | — |
+| `wotd_copy` | Word of the Day copy icon used | `kokoy` |
+| `wotd_share` | Word of the Day share icon used | `kokoy`, `method` (`native` or `clipboard-fallback`) |
+
 ## Data & content licensing (default — change if you'd rather use something else)
 
 This scaffold assumes:
