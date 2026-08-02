@@ -59,10 +59,9 @@
         placeholder="Search a Kokoy or English word…"
         autocomplete="off"
       />
-      <select id="category-filter" aria-label="Filter by category">
-        <option value="">All categories</option>
-      </select>
     </div>
+
+    <div class="chip-filter" id="category-chips" role="group" aria-label="Filter by category"></div>
 
     <p class="result-count" id="result-count" aria-live="polite"></p>
 
@@ -111,8 +110,19 @@
         <h2 id="suggest-heading">Suggest a Word or Phrase</h2>
       </summary>
       <div class="accordion-body" id="suggest-body">
-        <p>Know a Kokoy word, phrase, or correction that belongs here? Submit it below — it opens a pre-filled entry on GitHub for review, no account setup required to draft it.</p>
+        <p>Know a Kokoy word, phrase, or correction that belongs here? Submit it below — no account needed.</p>
         <form id="suggest-form">
+          <input type="hidden" name="access_key" id="s-access-key" value="" />
+          <input type="hidden" name="subject" value="New Kokoy word suggestion" />
+          <input
+            type="checkbox"
+            name="botcheck"
+            id="s-botcheck"
+            class="visually-hidden"
+            tabindex="-1"
+            autocomplete="off"
+          />
+
           <label for="s-kokoy">Kokoy word or phrase</label>
           <input type="text" id="s-kokoy" name="kokoy" required />
 
@@ -128,12 +138,19 @@
           <label for="s-name">Your name or village (optional, for credit)</label>
           <input type="text" id="s-name" name="contributor" />
 
-          <p class="form-hint" id="suggest-hint">This opens GitHub in a new tab with your suggestion pre-filled. Nothing is submitted until you click "Submit new issue" there.</p>
+          <p class="form-hint" id="suggest-hint">Submitted directly to our team. Nothing is posted publicly.</p>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" aria-describedby="suggest-hint">Preview &amp; Submit Suggestion</button>
+            <button type="submit" class="btn btn-primary" aria-describedby="suggest-hint">Submit Suggestion</button>
           </div>
+
+          <p id="suggest-status" class="form-status" role="status" aria-live="polite"></p>
         </form>
+
+        <p class="form-alt">
+          Prefer GitHub?
+          <button type="button" id="suggest-github-btn" class="btn btn-secondary">Submit as a GitHub Issue instead</button>
+        </p>
       </div>
     </details>
   </section>

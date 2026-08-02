@@ -6,16 +6,36 @@
   "use strict";
 
   let dictionary = [];
+  let activeCategory = ""; // "" = All
+
+  // Fixed display order for the taxonomy — keeps chips and grouped sections
+  // in a stable, sensible order instead of whatever order Set() happens to
+  // produce.
+  const CATEGORY_ORDER = [
+    "Family & People",
+    "Body & Health",
+    "Food & Drink",
+    "Animals",
+    "Time & Days",
+    "Character & Emotion",
+    "Actions",
+    "Everyday Objects & Places",
+    "Descriptive Words",
+    "Common Expressions",
+  ];
 
   const els = {
     searchInput: document.getElementById("search-input"),
-    categoryFilter: document.getElementById("category-filter"),
+    categoryChips: document.getElementById("category-chips"),
     resultCount: document.getElementById("result-count"),
     wordList: document.getElementById("word-list"),
     wotdWord: document.getElementById("wotd-word"),
     wotdEnglish: document.getElementById("wotd-english"),
     wotdPron: document.getElementById("wotd-pron"),
     suggestForm: document.getElementById("suggest-form"),
+    suggestStatus: document.getElementById("suggest-status"),
+    suggestAccessKey: document.getElementById("s-access-key"),
+    suggestGithubBtn: document.getElementById("suggest-github-btn"),
     kofiLink: document.getElementById("kofi-link"),
     footerEmail: document.getElementById("footer-email"),
     installBanner: document.getElementById("install-banner"),
@@ -48,18 +68,40 @@
     els.wotdPron.textContent = word.pronunciation ? `/${word.pronunciation}/` : "";
   }
 
-  // ---- Category filter ------------------------------------------------
+  // ---- Category chips ---------------------------------------------------
 
-  function populateCategories() {
-    const categories = Array.from(
-      new Set(dictionary.map((w) => w.category).filter(Boolean))
-    ).sort();
-    for (const cat of categories) {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.textContent = cat;
-      els.categoryFilter.appendChild(opt);
+  function populateCategoryChips() {
+    const present = new Set(dictionary.map((w) => w.category).filter(Boolean));
+    const orderedCats = CATEGORY_ORDER.filter((c) => present.has(c));
+
+    els.categoryChips.innerHTML = "";
+    els.categoryChips.appendChild(makeChip("All", ""));
+    for (const cat of orderedCats) {
+      const count = dictionary.filter((w) => w.category === cat).length;
+      els.categoryChips.appendChild(makeChip(`${cat} (${count})`, cat));
     }
+    updateChipState();
+  }
+
+  function makeChip(label, value) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip";
+    btn.textContent = label;
+    btn.dataset.category = value;
+    btn.setAttribute("aria-pressed", "false");
+    btn.addEventListener("click", () => {
+      activeCategory = value;
+      updateChipState();
+      renderResults();
+    });
+    return btn;
+  }
+
+  function updateChipState() {
+    els.categoryChips.querySelectorAll(".chip").forEach((chip) => {
+      chip.setAttribute("aria-pressed", String(chip.dataset.category === activeCategory));
+    });
   }
 
   // ---- Search & render --------------------------------------------------
@@ -121,10 +163,25 @@
     return li;
   }
 
+  // Grouped (browse) view only when there's no active search or category
+  // filter — that's the "just looking around" state, where chunking by
+  // category into collapsed sections beats one 217-row scroll. The moment
+  // someone searches or picks a category, they want a flat answer, not a
+  // folder to open first.
+  function isGroupedView(query) {
+    return !query.trim() && !activeCategory;
+  }
+
   function renderResults() {
     const query = els.searchInput.value;
-    const category = els.categoryFilter.value;
-    const filtered = dictionary.filter((w) => matches(w, query, category));
+
+    if (isGroupedView(query)) {
+      renderGroupedView();
+      els.resultCount.textContent = `${dictionary.length} words across ${CATEGORY_ORDER.filter((c) => dictionary.some((w) => w.category === c)).length} categories`;
+      return;
+    }
+
+    const filtered = dictionary.filter((w) => matches(w, query, activeCategory));
 
     els.wordList.innerHTML = "";
     if (!filtered.length) {
@@ -143,6 +200,38 @@
     els.resultCount.textContent = `${filtered.length} of ${dictionary.length} words`;
   }
 
+  function renderGroupedView() {
+    els.wordList.innerHTML = "";
+    const frag = document.createDocumentFragment();
+
+    for (const cat of CATEGORY_ORDER) {
+      const words = dictionary.filter((w) => w.category === cat);
+      if (!words.length) continue;
+
+      const li = document.createElement("li");
+      li.className = "category-group-wrap";
+
+      const details = document.createElement("details");
+      details.className = "category-group";
+
+      const summary = document.createElement("summary");
+      summary.innerHTML = `${escapeHtml(cat)} <span class="category-count">${words.length}</span>`;
+      details.appendChild(summary);
+
+      const nestedList = document.createElement("ul");
+      nestedList.className = "word-list";
+      for (const word of words) {
+        nestedList.appendChild(renderWordCard(word));
+      }
+      details.appendChild(nestedList);
+
+      li.appendChild(details);
+      frag.appendChild(li);
+    }
+
+    els.wordList.appendChild(frag);
+  }
+
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, "&amp;")
@@ -151,47 +240,89 @@
       .replace(/"/g, "&quot;");
   }
 
-  // ---- Suggest-a-word -> GitHub Issue -----------------------------------
+  // ---- Suggest-a-word -----------------------------------------------------
+  // Primary path: Web3Forms — no GitHub account needed, submits straight to
+  // your inbox. Secondary path: pre-filled GitHub Issue, for contributors
+  // who'd rather go that route. See js/config.js for the access key.
+
+  function buildGithubIssueUrl() {
+    const data = new FormData(els.suggestForm);
+    const kokoy = (data.get("kokoy") || "").toString().trim();
+    const english = (data.get("english") || "").toString().trim();
+    const pron = (data.get("pronunciation") || "").toString().trim();
+    const example = (data.get("example") || "").toString().trim();
+    const contributor = (data.get("contributor") || "").toString().trim();
+
+    const title = `Word suggestion: ${kokoy || "(untitled)"}`;
+    const body = [
+      `**Kokoy word/phrase:** ${kokoy}`,
+      `**English meaning:** ${english}`,
+      pron ? `**Pronunciation:** ${pron}` : "",
+      example ? `**Example sentence:** ${example}` : "",
+      contributor ? `**Suggested by:** ${contributor}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const repo = KOKOY_CONFIG.githubRepo;
+    return (
+      `https://github.com/${repo}/issues/new?` +
+      `title=${encodeURIComponent(title)}&` +
+      `body=${encodeURIComponent(body)}&` +
+      `labels=${encodeURIComponent("word-suggestion")}`
+    );
+  }
 
   function setupSuggestForm() {
-    els.suggestForm.addEventListener("submit", (e) => {
+    if (els.suggestAccessKey) {
+      els.suggestAccessKey.value = KOKOY_CONFIG.web3formsAccessKey || "";
+    }
+
+    els.suggestForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(els.suggestForm);
-      const kokoy = (data.get("kokoy") || "").toString().trim();
-      const english = (data.get("english") || "").toString().trim();
-      const pron = (data.get("pronunciation") || "").toString().trim();
-      const example = (data.get("example") || "").toString().trim();
-      const contributor = (data.get("contributor") || "").toString().trim();
 
-      const title = `Word suggestion: ${kokoy}`;
-      const body = [
-        `**Kokoy word/phrase:** ${kokoy}`,
-        `**English meaning:** ${english}`,
-        pron ? `**Pronunciation:** ${pron}` : "",
-        example ? `**Example sentence:** ${example}` : "",
-        contributor ? `**Suggested by:** ${contributor}` : "",
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-      const repo = KOKOY_CONFIG.githubRepo;
-      if (!repo || repo.startsWith("YOUR-")) {
-        alert(
-          "The GitHub repo hasn't been configured yet in js/config.js (githubRepo). " +
-          "Update it once your repo is created so suggestions can be submitted."
-        );
+      const key = KOKOY_CONFIG.web3formsAccessKey;
+      if (!key || key.startsWith("YOUR-")) {
+        els.suggestStatus.textContent =
+          "Submissions aren't configured yet (missing Web3Forms access key in js/config.js). Use the GitHub option below instead.";
         return;
       }
 
-      const url =
-        `https://github.com/${repo}/issues/new?` +
-        `title=${encodeURIComponent(title)}&` +
-        `body=${encodeURIComponent(body)}&` +
-        `labels=${encodeURIComponent("word-suggestion")}`;
+      const formData = new FormData(els.suggestForm);
+      const payload = Object.fromEntries(formData);
+      els.suggestStatus.textContent = "Sending…";
 
-      window.open(url, "_blank", "noopener");
-      els.suggestForm.reset();
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+          els.suggestStatus.textContent = "Thanks! Your suggestion was sent.";
+          els.suggestForm.reset();
+          if (els.suggestAccessKey) els.suggestAccessKey.value = key;
+        } else {
+          els.suggestStatus.textContent =
+            result.message || "Something went wrong sending that — try the GitHub option below instead.";
+        }
+      } catch (err) {
+        els.suggestStatus.textContent =
+          "Couldn't reach the submission service — try the GitHub option below instead.";
+      }
     });
+
+    if (els.suggestGithubBtn) {
+      els.suggestGithubBtn.addEventListener("click", () => {
+        const repo = KOKOY_CONFIG.githubRepo;
+        if (!repo || repo.startsWith("YOUR-")) {
+          els.suggestStatus.textContent = "GitHub repo isn't configured yet in js/config.js.";
+          return;
+        }
+        window.open(buildGithubIssueUrl(), "_blank", "noopener");
+      });
+    }
   }
 
   // ---- Ko-fi / footer links ---------------------------------------------
@@ -276,11 +407,10 @@
     setupLinks();
     setupSuggestForm();
     await loadData();
-    populateCategories();
+    populateCategoryChips();
     renderWordOfTheDay();
     renderResults();
     els.searchInput.addEventListener("input", renderResults);
-    els.categoryFilter.addEventListener("change", renderResults);
     setupAccordionAnchors();
     registerServiceWorker();
   }

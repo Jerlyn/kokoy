@@ -7,10 +7,11 @@ Built as a Progressive Web App (PWA) — no build tools, no framework, no backen
 ## Features
 
 - Full-text search across all dictionary entries (Kokoy → English and English → Kokoy)
-- Category filtering
+- 10-category taxonomy (Family & People, Body & Health, Food & Drink, Animals, Time & Days, Character & Emotion, Actions, Everyday Objects & Places, Descriptive Words, Common Expressions), auto-tagged and ready for review
+- Browse mode groups words into collapsed category sections (short mobile scroll); typing a search flattens straight to ranked results; category chips work as an AND filter on top of either
 - Word of the Day (deterministic by calendar date — same word for everyone, every day)
 - Offline support via service worker (installable on phone or desktop)
-- "Suggest a word" form that opens a pre-filled GitHub Issue — no login-gated backend to maintain
+- "Suggest a word" form — submits directly via Web3Forms, no account needed; GitHub Issue kept as a secondary option for technical contributors
 - Ko-fi donate button
 - WCAG AA color contrast throughout (verified programmatically, see `docs/accessibility-check.md` if present)
 
@@ -35,8 +36,6 @@ kokoy-pwa/
 
 ## 1. Before you deploy: edit `js/config.js`
 
-Three values need to be set:
-
 Already set:
 
 ```js
@@ -45,7 +44,13 @@ kofiUsername: "designlady",
 contactEmail: "jerlyn@designlady.com",
 ```
 
-Until `githubRepo` is set, the "Suggest a word" button will show an alert instead of opening GitHub. Until `kofiUsername` is set, the Donate button links to the Donate section instead of Ko-fi.
+Still needed — `web3formsAccessKey`. This powers the primary "Suggest a word" submission path (no GitHub account required for the person submitting):
+
+1. Go to [web3forms.com](https://web3forms.com), enter `jerlyn@designlady.com`, no signup/account needed.
+2. The access key arrives by email — paste it into `web3formsAccessKey` in `js/config.js`.
+3. Free tier: 250 submissions/month, more than enough for a niche-language dictionary; upgrade only if you outgrow it.
+
+Until that key is set, the form shows a message pointing people to the GitHub option instead. The GitHub Issue submission still works as a secondary path (click "Submit as a GitHub Issue instead" under the form) for contributors who prefer it — that one does need `githubRepo` set, which it already is. Until `kofiUsername` is set, the Donate button links to the Donate section instead of Ko-fi.
 
 ## 2. Push to GitHub
 
