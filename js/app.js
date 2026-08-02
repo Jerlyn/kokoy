@@ -174,8 +174,15 @@
 
   function renderResults() {
     const query = els.searchInput.value;
+    const grouped = isGroupedView(query);
 
-    if (isGroupedView(query)) {
+    // Chips only add value once there's a search or an active category to
+    // narrow further — while browsing, the accordion headers below are
+    // already the category list, so showing both is the same 10 names
+    // twice. Hide the chips in that state instead of duplicating them.
+    els.categoryChips.classList.toggle("chip-filter--hidden", grouped);
+
+    if (grouped) {
       renderGroupedView();
       els.resultCount.textContent = `${dictionary.length} words across ${CATEGORY_ORDER.filter((c) => dictionary.some((w) => w.category === c)).length} categories`;
       return;

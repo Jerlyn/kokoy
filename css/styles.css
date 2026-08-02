@@ -21,8 +21,21 @@
   --dark: #212529;
   --gray: #595959;
   --lightgray: #ADB5BD;
+  /* Your brand's specified neutral, used specifically for borders on real
+     interactive controls (search input, clickable <details> containers) —
+     #ADB5BD only measures 2.07:1 on white, below the 3:1 WCAG 1.4.11
+     minimum for a perceivable control boundary; #6C757D clears it at
+     4.69:1. Decorative-only dividers keep --lightgray. */
+  --border-strong: #6C757D;
 
-  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Headings + UI chrome (nav, buttons, chips, labels): Plus Jakarta Sans,
+     geometric and clear at small sizes. Definitions/notes/history content:
+     Lora, a serif to give word entries an authentic lexicon feel. Both
+     fall back to the system stack if the Google Fonts request can't reach
+     the network (e.g. offline PWA use before the font's been cached). */
+  --font-heading: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Lora", Georgia, "Times New Roman", serif;
   --radius: 10px;
   --shadow: 0 2px 10px rgba(2, 12, 40, 0.12);
 }
@@ -162,11 +175,16 @@ section > h2 {
 }
 
 /* Section-level accordion (About, Suggest a Word) — native <details>, so it
-   works with zero JS and is keyboard/screen-reader operable by default. */
+   works with zero JS and is keyboard/screen-reader operable by default.
+   Styled deliberately bolder than .category-group below: these are site
+   sections (structure), not dictionary content, and should read that way
+   at a glance rather than blending into the word-browsing list. */
 .section-accordion {
-  border: 1px solid var(--lightgray);
+  border: 1px solid var(--border-strong);
+  border-top: 4px solid var(--pink);
   border-radius: var(--radius);
   background: var(--white);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
@@ -177,7 +195,8 @@ section > h2 {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--offwhite);
 }
 
 .section-accordion > summary::-webkit-details-marker { display: none; }
@@ -193,7 +212,7 @@ section > h2 {
   content: "+";
   font-size: 1.4rem;
   line-height: 1;
-  color: var(--purple);
+  color: var(--pink-dark);
   flex-shrink: 0;
   transition: transform 0.15s ease;
 }
@@ -203,8 +222,11 @@ section > h2 {
 }
 
 .section-accordion .accordion-body {
-  padding: 0 1.25rem 1.25rem;
+  padding: 1.25rem;
 }
+
+/* Category groups (below, in the Dictionary section) stay deliberately
+   plain and flat by contrast — content chunks, not navigation. */
 
 /* Word of the day */
 .wotd-card {
@@ -240,18 +262,21 @@ section > h2 {
 .wotd-word {
   font-size: 2rem;
   margin: 0;
+  font-family: var(--font-heading);
 }
 
 .wotd-english {
   font-size: 1.1rem;
   margin: 0.25rem 0 0.75rem;
   color: var(--offwhite);
+  font-family: var(--font-serif);
 }
 
 .wotd-pron {
   font-style: italic;
   color: var(--offwhite);
   opacity: 0.85;
+  font-family: var(--font-serif);
 }
 
 /* Search */
@@ -266,7 +291,7 @@ section > h2 {
   flex: 1 1 240px;
   padding: 0.7rem 1rem;
   font-size: 1rem;
-  border: 2px solid var(--lightgray);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius);
   background: var(--white);
   color: var(--navy);
@@ -283,6 +308,12 @@ section > h2 {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: 0 0 1rem;
+}
+
+/* Shown only once search or a category is active — see renderResults() in
+   app.js. While browsing, the accordion headers already list categories. */
+.chip-filter--hidden {
+  display: none;
 }
 
 .chip {
@@ -322,7 +353,7 @@ section > h2 {
 
 .word-card {
   background: var(--white);
-  border: 1px solid var(--lightgray);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 1rem 1.1rem;
 }
@@ -366,6 +397,7 @@ section > h2 {
   border-top: 1px dashed var(--lightgray);
   color: var(--dark);
   font-size: 0.95rem;
+  font-family: var(--font-serif);
 }
 
 .word-detail dt {
@@ -388,7 +420,7 @@ section > h2 {
    mobile lands on ~10 tappable rows instead of scrolling 217 words. */
 .category-group {
   background: var(--white);
-  border: 1px solid var(--lightgray);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -529,7 +561,7 @@ textarea { min-height: 90px; resize: vertical; }
 
 .about-item {
   background: var(--white);
-  border-left: 4px solid var(--purple);
+  border: 1px solid var(--lightgray);
   border-radius: var(--radius);
   padding: 1.1rem 1.25rem;
   box-shadow: var(--shadow);
@@ -544,6 +576,8 @@ textarea { min-height: 90px; resize: vertical; }
 .about-item p {
   margin: 0;
   color: var(--dark);
+  font-family: var(--font-serif);
+  line-height: 1.6;
 }
 
 @media (min-width: 640px) {
